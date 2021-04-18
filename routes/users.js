@@ -59,7 +59,6 @@ router.post('/', async (req, res) => {
 
 /*
  * Get a user by user id
- * Only admin can access
  */
 router.get('/:userId',
     authorization.verifyToken,
@@ -68,8 +67,7 @@ router.get('/:userId',
         try {
             const user = await User.findById(req.params.userId).exec();
             if (user === null) {
-                res.status(400).json({ error: 'The id is not existed!' })
-                return
+                return res.status(400).json({ error: 'The id is not existed!' })
             }
             else {
                 //console.log(post)
@@ -78,6 +76,39 @@ router.get('/:userId',
         } catch (err) {
             //console.log(err)
             res.status(400).json({ error: 'The id is not a objectId!' });
+        }
+    })
+
+router.patch('/:userId',
+    authorization.verifyToken,
+    authorization.grantAccess('updateOwn', 'user'),
+    async (req, res) => {
+        try {
+            if (req.user._id !== req.params.userId) {
+                return res.status(400).json({ error: 'The id is not consistent with the token!' })
+            }
+            let params = {};
+            // email cannot be changed
+            for (let prop in req.body) if (req.body[prop] && prop !== 'email') params[prop] = req.body[prop];
+            const user = await User.findById(req.params.userId).exec();
+
+            // hash passwords
+            if (params['password']) {
+                const salt = await bcrypt.genSalt(10);
+                params['password'] = await bcrypt.hash(params['password'], salt);
+            }
+            
+            if (user === null) {
+                return res.status(400).json({ error: 'The id is not existed!' })
+            }
+            const updateUser = await User.findByIdAndUpdate(
+                req.params.userId,
+                params,
+                { useFindAndModify: false }
+            );
+            res.status(200).send("User profile modified!");
+        } catch (err) {
+            res.status(400).send({ error: err });
         }
     })
 
@@ -96,24 +127,6 @@ router.delete('/:userId',
         } catch (err) {
             //console.log(err)
             res.status(400).send({ error: 'The id is not a objectId!' });
-        }
-    })
-
-router.patch('/:userId',
-    authorization.verifyToken,
-    authorization.grantAccess('updateOwn', 'user'),
-    async (req, res) => {
-        try {
-            let params = {};
-            for(let prop in req.body) if(req.body[prop]) params[prop] = req.body[prop];
-            const updateUser = await User.findByIdAndUpdate(
-                req.params.userId,
-                params,
-                {useFindAndModify: false}
-            );
-            res.status(200).send("User profile modified!");
-        } catch (err) {
-            res.status(400).send({ error: err });
         }
     })
 
