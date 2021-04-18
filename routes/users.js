@@ -7,6 +7,7 @@ const authorization = require('../validation/authorization');
 
 /*
  * Get all users
+ * Only admin can access
  */
 router.get('/',
     authorization.verifyToken,
@@ -56,6 +57,10 @@ router.post('/', async (req, res) => {
     }
 })
 
+/*
+ * Get a user by user id
+ * Only admin can access
+ */
 router.get('/:userId',
     authorization.verifyToken,
     authorization.grantAccess('readOwn', 'user'),
@@ -63,46 +68,53 @@ router.get('/:userId',
         try {
             const user = await User.findById(req.params.userId).exec();
             if (user === null) {
-                res.json({ message: 'The id is not existed!' })
+                res.status(400).json({ error: 'The id is not existed!' })
                 return
             }
             else {
                 //console.log(post)
-                res.json(post);
+                res.json(user);
             }
         } catch (err) {
             //console.log(err)
-            res.json({ message: 'The id is not a objectId!' });
+            res.status(400).json({ error: 'The id is not a objectId!' });
         }
     })
 
-router.delete('/:postId', async (req, res) => {
-    try {
-        const removePost = await Post.deleteOne({ _id: req.params.postId }).exec();
-        if (removePost.deletedCount == 1) {
-            res.json('Deleted!');
+router.delete('/:userId',
+    authorization.verifyToken,
+    authorization.grantAccess('deleteAny', 'user'),
+    async (req, res) => {
+        try {
+            const removeUser = await User.deleteOne({ _id: req.params.userId }).exec();
+            if (removeUser.deletedCount == 1) {
+                res.status(204).send();
+            }
+            else {
+                res.status(400).send('The id is not existed!');
+            }
+        } catch (err) {
+            //console.log(err)
+            res.status(400).send({ error: 'The id is not a objectId!' });
         }
-        else {
-            res.json('The id is not existed!');
-        }
-    } catch (err) {
-        //console.log(err)
-        res.json({ message: 'The id is not a objectId!' });
-    }
-})
+    })
 
-router.patch('/:postId', async (req, res) => {
-    try {
-        const updatePost = await Post.updateOne(
-            { _id: req.params.postId },
-            { $set: { title: req.body.title } }
-        );
-        console.log(updatePost)
-        res.json(updatePost);
-    } catch (err) {
-        //console.log(err)
-        res.json({ message: err });
-    }
-})
+router.patch('/:userId',
+    authorization.verifyToken,
+    authorization.grantAccess('updateOwn', 'user'),
+    async (req, res) => {
+        try {
+            let params = {};
+            for(let prop in req.body) if(req.body[prop]) params[prop] = req.body[prop];
+            const updateUser = await User.findByIdAndUpdate(
+                req.params.userId,
+                params,
+                {useFindAndModify: false}
+            );
+            res.status(200).send("User profile modified!");
+        } catch (err) {
+            res.status(400).send({ error: err });
+        }
+    })
 
 module.exports = router;
