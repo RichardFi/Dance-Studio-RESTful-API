@@ -4,7 +4,7 @@ const Course = require('../models/Course');
 const { courseValidation } = require('../validation');
 const authorization = require('../validation/authorization');
 
-// get all courses
+// Get all courses
 router.get('/', async (req, res) => {
     try {
         const courses = await Course.find();
@@ -38,7 +38,7 @@ router.get('/:courseId',
 
 /* 
  * Create a new course
- * params: name, type, description, level, teacher
+ * params: name, type, description, level, teacher, classes
  * success response: the created course's id
  */
 router.post('/',
@@ -70,6 +70,9 @@ router.post('/',
     }
 )
 
+/* 
+ * Update information of a course
+ */
 router.patch('/:courseId',
     authorization.verifyToken,
     authorization.grantAccess('updateAny', 'course'),
@@ -88,7 +91,9 @@ router.patch('/:courseId',
         }
     })
 
-
+/* 
+ * Delete a course
+ */
 router.delete('/:courseId',
     authorization.verifyToken,
     authorization.grantAccess('deleteAny', 'course'),
