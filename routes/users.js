@@ -14,17 +14,21 @@ router.get('/',
     authorization.grantAccess('readAny', 'user'),
     async (req, res) => {
         try {
-            if(req.query){
+            if (req.query) {
                 let params = {};
-                for (let prop in req.query) if (req.query[prop]) params[prop] = '{$regex: ' + req.query[prop] + ', $options: "i"}';
-                const users = await User.find({firstName:'yongrui' });
-                res.status(200).send(users);  
+                for (let prop in req.query) if (req.query[prop]){
+                    let obj = {};
+                    obj['$regex'] = new RegExp(req.query[prop],'i');
+                    params[prop] = obj;
+                };
+                const users = await User.find(params);
+                res.status(200).send(users);
             }
-            else{
+            else {
                 const users = await User.find();
                 res.status(200).send(users);
             }
-            
+
         } catch (err) {
             res.status(400).send({ err: { message: err.message, stack: err.stack } });
         }

@@ -7,8 +7,20 @@ const authorization = require('../validation/authorization');
 // Get all courses
 router.get('/', async (req, res) => {
     try {
-        const courses = await Course.find();
-        res.status(200).send(courses);
+        if (req.query) {
+            let params = {};
+            for (let prop in req.query) if (req.query[prop]){
+                let obj = {};
+                obj['$regex'] = new RegExp(req.query[prop],'i');
+                params[prop] = obj;
+            };
+            const courses = await Course.find(params);
+            res.status(200).send(courses);
+        }
+        else {
+            const courses = await Course.find();
+            res.status(200).send(courses);
+        }
     } catch (err) {
         res.status(400).send({ message: err });
     }
