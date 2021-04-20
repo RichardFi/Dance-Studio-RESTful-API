@@ -17,14 +17,6 @@ const CourseSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    teachers: {
-        type: Array,
-        required: true,
-    },
-    classes: {
-        type: Array,
-        required: true,
-    },
 })
 
 module.exports = mongoose.model('Courses', CourseSchema);

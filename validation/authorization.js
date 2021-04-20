@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { roles } = require('./roles');
+const User = require('../models/User');
 
 module.exports.verifyToken = function (req, res, next) {
     const token = req.header('auth-token');
@@ -18,7 +19,9 @@ module.exports.verifyToken = function (req, res, next) {
 module.exports.grantAccess = function (action, resource) {
     return async (req, res, next) => {
         try {
-            const permission = roles.can(req.header('role'))[action](resource);
+            const user = await User.findById(req.user._id);
+            const permission = roles.can(user.role)[action](resource);
+            
             if (!permission.granted) {
                 return res.status(403).send({
                     error: "You don't have enough permission to perform this action"
