@@ -6,7 +6,7 @@ const { registerValidation } = require('../validation');
 const authorization = require('../validation/authorization');
 
 /*
- * Get all users
+ * Get users 
  * Only admin can access
  */
 router.get('/',
@@ -80,7 +80,7 @@ router.get('/:userId',
         try {
             const user = await User.findById(req.params.userId).exec();
             if (user === null) {
-                return res.status(400).send({ err: 'The id is not existed!' })
+                res.status(400).send({ err: 'The id is not existed!' })
             }
             else {
                 //console.log(post)

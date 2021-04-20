@@ -33,9 +33,11 @@ const courseValidation = (data) =>{
 const classValidation = (data) =>{
     const schema = Joi.object({
         name: Joi.string().required(),
-        type: Joi.string().required(),
         description: Joi.string().required(),
-        level: Joi.string().required(),
+        course: Joi.string().required(),
+        startTime: Joi.date().required(),
+        endTime: Joi.date().required(),
+        teacher: Joi.string().required()
     })
     return schema.validate(data);
 }
@@ -43,3 +45,4 @@ const classValidation = (data) =>{
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.courseValidation = courseValidation;
+module.exports.classValidation = classValidation;

@@ -10,12 +10,15 @@ app.use(express.json());
 const usersRoute = require('./routes/users');
 const authRoute = require('./routes/auth');
 const coursesRoute = require('./routes/courses');
+const classesRoute = require('./routes/classes');
 
 //const userRoute = require('./routes/user');
 
 app.use('/api/users', usersRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/courses', coursesRoute);
+app.use('/api/classes', classesRoute);
+
 // middlewares
 // app.use(auth)
 

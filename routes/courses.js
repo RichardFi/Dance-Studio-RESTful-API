@@ -4,7 +4,7 @@ const Course = require('../models/Course');
 const { courseValidation } = require('../validation');
 const authorization = require('../validation/authorization');
 
-// Get all courses
+// Get courses
 router.get('/', async (req, res) => {
     try {
         if (req.query) {
@@ -34,16 +34,15 @@ router.get('/:courseId',
         try {
             const course = await Course.findById(req.params.courseId).exec();
             if (course === null) {
-                res.status(400).json({ error: 'The id is not existed!' })
-                return
+                res.status(400).send({ err: 'The id is not existed!' })
             }
             else {
                 //console.log(post)
-                res.json(course);
+                res.send(course);
             }
         } catch (err) {
             //console.log(err)
-            res.status(400).json({ error: 'The id is not a objectId!' });
+            res.status(400).send({ err: 'The id is not a objectId!' });
         }
     }
 )
@@ -62,9 +61,9 @@ router.post('/',
         if (error) return res.status(400).send(error.details[0].message);
 
         // checking if the course is already in the database
-        const courseExist = await Course.findOne({ name: req.body.name });
+/*         const courseExist = await Course.findOne({ name: req.body.name });
         if (courseExist) return res.status(400).send('The course already exists')
-
+ */
         // create a new course
         const course = new Course({
             name: req.body.name,
@@ -99,7 +98,7 @@ router.patch('/:courseId',
             );
             res.status(200).send("Course information modified!");
         } catch (err) {
-            res.status(400).send({ error: err });
+            res.status(400).send({ err: err });
         }
     })
 
@@ -120,7 +119,7 @@ router.delete('/:courseId',
             }
         } catch (err) {
             //console.log(err)
-            res.status(400).send({ error: 'The course id is not a objectId!' });
+            res.status(400).send({ err: 'The course id is not a objectId!' });
         }
     })
 
