@@ -1,3 +1,3 @@
 # Dance-Club-RESTful-API
  
-# The RESTful API for a dance studio
+## RESTful API for a dance studio
