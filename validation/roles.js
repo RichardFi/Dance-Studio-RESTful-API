@@ -5,6 +5,8 @@ exports.roles = (function () {
     ac.grant("basic")
         .readOwn("user")
         .updateOwn("user")
+        .updateOwn("class")
+        .deleteOwn('class')
         //.readAny("course")
         //.readAny("class")
         //.readAny("teacher")

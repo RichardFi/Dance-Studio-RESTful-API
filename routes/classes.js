@@ -78,4 +78,21 @@ router.post('/',
     }
 )
 
+router.patch('/:classId',
+    authorization.verifyToken,
+    authorization.grantAccess('updateOwn', 'class'),
+    async (req, res) => {
+        try {
+            let params = {};
+            for (let prop in req.body) if (req.body[prop]) params[prop] = req.body[prop];
+            const updateCourse = await Course.findByIdAndUpdate(
+                req.params.courseId,
+                params,
+                { useFindAndModify: false }
+            );
+            res.status(200).send("Course information modified!");
+        } catch (err) {
+            res.status(400).send({ err: err });
+        }
+    })
 module.exports = router;
