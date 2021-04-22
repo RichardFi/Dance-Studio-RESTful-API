@@ -38,7 +38,8 @@ const UserSchema = mongoose.Schema({
         default: 'basic'
     },
     classes:{
-        type: Array,
+        type: [String],
+        default: []
     }
 })
 

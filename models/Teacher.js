@@ -12,12 +12,12 @@ const TeacherSchema = mongoose.Schema({
         max: 16
     },
     courses: {
-        type: Array,
-        required: true,
+        type: [String],
+        default: []
     },
     classes: {
-        type: Array,
-        required: true,
+        type: [String],
+        default: []
     },
     enrolDate: {
         type: Date,

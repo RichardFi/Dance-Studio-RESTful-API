@@ -22,8 +22,8 @@ const ClassSchema = mongoose.Schema({
         required: true,
     },
     users: {
-        type: Array,
-        required: true,
+        type: [String],
+        default: []
     },
     description: {
         type: String,
