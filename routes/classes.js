@@ -10,7 +10,11 @@ router.get('/', async (req, res) => {
     try {
         if (req.query) {
             let params = {};
-            for (let prop in req.query) if (req.query[prop]) params[prop] = '{$regex: ' + req.query[prop] + ', $options: "i"}';
+            for (let prop in req.query) if (req.query[prop]) {
+                let obj = {};
+                obj['$regex'] = new RegExp(req.query[prop], 'i');
+                params[prop] = obj;
+            };
             const danceClasses = await DanceClass.find(params);
             res.status(200).send(danceClasses);
         }

@@ -9,9 +9,9 @@ router.get('/', async (req, res) => {
     try {
         if (req.query) {
             let params = {};
-            for (let prop in req.query) if (req.query[prop]){
+            for (let prop in req.query) if (req.query[prop]) {
                 let obj = {};
-                obj['$regex'] = new RegExp(req.query[prop],'i');
+                obj['$regex'] = new RegExp(req.query[prop], 'i');
                 params[prop] = obj;
             };
             const courses = await Course.find(params);
@@ -61,9 +61,9 @@ router.post('/',
         if (error) return res.status(400).send(error.details[0].message);
 
         // checking if the course is already in the database
-/*         const courseExist = await Course.findOne({ name: req.body.name });
-        if (courseExist) return res.status(400).send('The course already exists')
- */
+        /*         const courseExist = await Course.findOne({ name: req.body.name });
+                if (courseExist) return res.status(400).send('The course already exists')
+         */
         // create a new course
         const course = new Course({
             name: req.body.name,
