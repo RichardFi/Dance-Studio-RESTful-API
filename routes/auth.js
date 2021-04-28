@@ -26,7 +26,8 @@ router.post('/', async (req, res) => {
             expiresIn: "7d"
         });
 
-    res.header('auth-token', token).status(200).send({ role: user.role });
+
+    return res.header('auth-token', token).status(200).send({ role: user.role });
 
     //res.send('Logged in!');
 })
