@@ -1,10 +1,9 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+var cors = require("cors");
 
 require('dotenv/config');
-
-app.use(express.json());
 
 // import routes
 const usersRoute = require('./routes/users');
@@ -13,6 +12,8 @@ const coursesRoute = require('./routes/courses');
 const classesRoute = require('./routes/classes');
 
 //const userRoute = require('./routes/user');
+app.use(cors());
+app.use(express.json());
 
 app.use('/api/users', usersRoute);
 app.use('/api/auth', authRoute);
@@ -23,7 +24,7 @@ app.use('/api/classes', classesRoute);
 // app.use(auth)
 
 // routes
-app.get('/', (req,res)=>{
+app.get('/', (req, res) => {
     res.send('We are on home');
 })
 
@@ -31,9 +32,9 @@ app.get('/', (req,res)=>{
 // will change
 
 mongoose.connect(process.env.DB_CONNECTION,
-    { useNewUrlParser: true, useUnifiedTopology: true }, () =>{
-    console.log('connected to DB!');
-});
+    { useNewUrlParser: true, useUnifiedTopology: true }, () => {
+        console.log('connected to DB!');
+    });
 
 // listen to the server
 const port = process.env.PORT || 3001;
