@@ -3,8 +3,9 @@ const { roles } = require('./roles');
 const User = require('../models/User');
 
 module.exports.verifyToken = function (req, res, next) {
-    const token = req.header('auth-token');
-    if (!token) return res.status(401).send({ err: 'Access Denied, please login !' });
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+      if (!token) return res.status(401).send({ err: 'Access Denied, please login !' });
 
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET);
@@ -21,7 +22,7 @@ module.exports.grantAccess = function (action, resource) {
         try {
             const user = await User.findById(req.user._id);
             if (user == null){
-                return res.status(401).send({ err: 'Invalid Token' });
+                return res.status(401).send({ err: 'Invalid Token, wrong user' });
             }
             const permission = roles.can(user.role)[action](resource);
             
