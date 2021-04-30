@@ -5,6 +5,24 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { loginValidation } = require('../validation');
 
+// Get user by token to check the login status
+router.get('/',
+    async (req, res) => {
+        const authHeader = req.headers['authorization']
+        
+        const token = authHeader && authHeader.split(' ')[1]
+        console.log(authHeader)
+        if (!token) return res.status(401).send({ err: 'Access Denied, please login !' });
+
+        try {
+            const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+            // userId
+            return res.status(200).send({ user: verified });
+        } catch (err) {
+            res.status(401).send({ err: 'Invalid Token' });
+        }
+    })
+
 // login
 router.post('/', async (req, res) => {
     // validate data format before login

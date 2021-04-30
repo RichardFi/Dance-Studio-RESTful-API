@@ -12,7 +12,15 @@ const coursesRoute = require('./routes/courses');
 const classesRoute = require('./routes/classes');
 
 //const userRoute = require('./routes/user');
-app.use(cors());
+//app.use(cors());
+app.use(cors({
+    origin: '*',
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+    maxAge: 500,
+    credentials: true,  //cookie
+    allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS', 'PUT'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 app.use(express.json());
 
 app.use('/api/users', usersRoute);
