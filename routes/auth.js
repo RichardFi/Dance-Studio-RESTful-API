@@ -11,7 +11,7 @@ router.get('/',
         const authHeader = req.headers['authorization']
         
         const token = authHeader && authHeader.split(' ')[1]
-        console.log(authHeader)
+        //console.log(authHeader)
         if (!token) return res.status(401).send({ err: 'Access Denied, please login !' });
 
         try {
