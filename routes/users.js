@@ -4,6 +4,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const { registerValidation } = require('../validation');
 const authorization = require('../validation/authorization');
+const jwt = require('jsonwebtoken');
 
 /*
  * Get users 
@@ -16,9 +17,9 @@ router.get('/',
         try {
             if (req.query) {
                 let params = {};
-                for (let prop in req.query) if (req.query[prop]){
+                for (let prop in req.query) if (req.query[prop]) {
                     let obj = {};
-                    obj['$regex'] = new RegExp(req.query[prop],'i');
+                    obj['$regex'] = new RegExp(req.query[prop], 'i');
                     params[prop] = obj;
                 };
                 const users = await User.find(params);
@@ -64,7 +65,12 @@ router.post('/', async (req, res) => {
 
     try {
         const savedUser = await user.save();
-        res.status(201).send({ user: user._id });
+        const token = jwt.sign({ _id: user._id },
+            process.env.TOKEN_SECRET,
+            {
+                expiresIn: "7d"
+            });
+        res.status(201).send({ user: user._id, token: token});
     } catch (err) {
         res.statas(400).send({ err: { message: err.message, stack: err.stack } });;
     }
