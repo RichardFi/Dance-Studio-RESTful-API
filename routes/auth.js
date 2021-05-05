@@ -27,15 +27,15 @@ router.get('/',
 router.post('/', async (req, res) => {
     // validate data format before login
     const { error } = loginValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) return res.status(400).send({message:'Invalid email or password format'});
 
     // check if email existed
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send('The email does not exists');
+    if (!user) return res.status(400).send({message:'The email does not exists'});
 
     // check if password is correct
     const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) return res.status(400).send('Invalid password');
+    if (!validPassword) return res.status(400).send({message:'Invalid password'});
 
     // create and assign a token
     const token = jwt.sign({ _id: user._id },
