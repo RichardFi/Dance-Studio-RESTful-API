@@ -58,6 +58,7 @@ router.post('/',
   authorization.grantAccess('updateAny', 'class'),
   async (req, res) => {
     // validate the data before we create a course
+    console.log(req.body)
     const { error } = classValidation(req.body)
     if (error) return res.status(400).send(error.details[0].message)
 
@@ -73,7 +74,7 @@ router.post('/',
 
     try {
       await danceClass.save()
-      res.status(201).send({ class: danceClass._id })
+      res.status(201).send({ class: danceClass._id, name: danceClass.name })
     } catch (err) {
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
