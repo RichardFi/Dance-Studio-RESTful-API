@@ -91,6 +91,7 @@ router.patch('/:classId',
     try {
       const params = {}
       let newUsers = []
+      // need to fix here,for PATCH, still need to req full users list in the class for both join and exit the class
       for (const prop in req.body) {
         if (req.body[prop]) {
           if (prop === 'users') {
@@ -122,7 +123,7 @@ router.patch('/:classId',
         params,
         { useFindAndModify: false }
       )
-      res.status(200).send('Class information modified!')
+      res.status(200).send({class: req.params.classId})
     } catch (err) {
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }

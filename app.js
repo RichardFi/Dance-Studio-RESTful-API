@@ -18,7 +18,7 @@ app.use(cors({
   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
   maxAge: 500,
   credentials: true, // cookie
-  allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS', 'PUT'],
+  allowMethods: ['GET', 'POST','PATCH', 'DELETE', 'OPTIONS', 'PUT'],
   allowHeaders: ['Content-Type', 'Authorization', 'Accept']
 }))
 app.use(express.json())
