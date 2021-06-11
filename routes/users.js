@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs')
 const { registerValidation } = require('../validation')
 const authorization = require('../validation/authorization')
 const jwt = require('jsonwebtoken')
+const DanceClass = require('../models/Class')
 
 /*
  * Get users
@@ -33,7 +34,8 @@ router.get('/',
     } catch (err) {
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
-  })
+  }
+)
 
 /*
  * Create a new user
@@ -95,7 +97,39 @@ router.get('/:userId',
       // console.log(err)
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
-  })
+  }
+)
+
+/*
+ * Get all classes in a given user, can be simplified
+ */
+router.get('/:userId/classes',
+  authorization.verifyToken,
+  authorization.grantAccess('readOwn', 'user'),
+  async (req, res) => {
+    const user = await User.findById(req.params.userId).exec()
+
+    try {
+      if (req.query) {
+        const params = {}
+        for (const prop in req.query) {
+          if (req.query[prop]) {
+            const obj = {}
+            obj.$regex = new RegExp(req.query[prop], 'i')
+            params[prop] = obj
+          }
+        };
+        const usersClasses = await DanceClass.find({ _id: { $in: user.classes },...params });
+          res.status(200).send(usersClasses)
+      } else {
+        const usersClasses = await DanceClass.find({ _id: { $in: user.classes } });
+        res.status(200).send(usersClasses)
+      }
+    } catch (err) {
+      res.status(400).send({ err: { message: err.message, stack: err.stack } })
+    }
+  }
+)
 
 router.patch('/:userId',
   authorization.verifyToken,

@@ -49,6 +49,33 @@ router.get('/:classId',
 )
 
 /*
+ * Get all users in a given class ******need fix
+ */
+router.get('/:classId/users',
+  async (req, res) => {
+    try {
+      const danceClasses = await DanceClass.findById(req.params.classId).exec().users
+      console.log(danceClasses)
+      if (req.query) {
+        const params = {}
+        for (const prop in req.query) {
+          if (req.query[prop]) {
+            const obj = {}
+            obj.$regex = new RegExp(req.query[prop], 'i')
+            params[prop] = obj
+          }
+        };
+        res.status(200).send(danceClasses.users)
+      } else {
+        res.status(200).send(danceClasses.users)
+      }
+    } catch (err) {
+      res.status(400).send({ message: err })
+    }
+  }
+)
+
+/*
  * Create a new class
  * params: name, course, start time, end time, description, teacher, users
  * success response: the created class's id
@@ -90,42 +117,15 @@ router.patch('/:classId',
   async (req, res) => {
     try {
       const params = {}
-      let newUsers = []
-      // need to fix here,for PATCH, still need to req full users list in the class for both join and exit the class
-      for (const prop in req.body) {
-        if (req.body[prop]) {
-          if (prop === 'users') {
-            newUsers = req.body[prop]
-          } else params[prop] = req.body[prop]
-        }
-      }
-      if (newUsers) {
-        const danceClass = await DanceClass.findById(
-          req.params.classId
-        )
-        if (danceClass.users.includes(newUsers)) {
-          return res.status(400).send({ err: { message: 'The user has already been in this class.' } })
-        }
-
-        await DanceClass.findByIdAndUpdate(
-          req.params.classId,
-          { $push: { users: newUsers } },
-          { useFindAndModify: false }
-        )
-        await User.findByIdAndUpdate(
-          newUsers,
-          { $push: { classes: req.params.classId } },
-          { useFindAndModify: false }
-        )
-      }
+      for (const prop in req.body) if (req.body[prop]) params[prop] = req.body[prop]
       await DanceClass.findByIdAndUpdate(
         req.params.classId,
         params,
         { useFindAndModify: false }
       )
-      res.status(200).send({class: req.params.classId})
+      res.status(200).send({ msg: 'class information changed', classId: req.params.classId })
     } catch (err) {
-      res.status(400).send({ err: { message: err.message, stack: err.stack } })
+      res.status(400).send({ err: err })
     }
   })
 
