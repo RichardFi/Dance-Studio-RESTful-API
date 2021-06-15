@@ -101,14 +101,13 @@ router.get('/:userId',
 )
 
 /*
- * Get all classes in a given user, can be simplified
+ * Get all classes in a given user
  */
 router.get('/:userId/classes',
   authorization.verifyToken,
   authorization.grantAccess('readOwn', 'user'),
   async (req, res) => {
     const user = await User.findById(req.params.userId).exec()
-
     try {
       if (req.query) {
         const params = {}
@@ -119,13 +118,73 @@ router.get('/:userId/classes',
             params[prop] = obj
           }
         };
-        const usersClasses = await DanceClass.find({ _id: { $in: user.classes },...params });
-          res.status(200).send(usersClasses)
+        const usersClasses = await DanceClass.find({ _id: { $in: user.classes }, ...params });
+        res.status(200).send(usersClasses)
       } else {
         const usersClasses = await DanceClass.find({ _id: { $in: user.classes } });
         res.status(200).send(usersClasses)
       }
     } catch (err) {
+      res.status(400).send({ err: { message: err.message, stack: err.stack } })
+    }
+  }
+)
+
+/*
+ * Get a class in a given user
+ */
+router.get('/:userId/classes/:classId',
+  authorization.verifyToken,
+  authorization.grantAccess('readOwn', 'user'),
+  async (req, res) => {
+    const user = await User.findById(req.params.userId).exec()
+    try {
+      if (user === null) {
+        res.status(400).send({ err: 'The user id is not existed!' })
+      } else {
+        const usersClass = await DanceClass.findById(req.params.classId);
+        if (usersClass === null) {
+          res.status(400).send({ err: 'The class id is not existed!' })
+        } else {
+          res.status(200).send(usersClass)
+        }
+      }
+    } catch (err) {
+      res.status(400).send({ err: { message: err.message, stack: err.stack } })
+    }
+  }
+)
+
+/*
+ * Add a user to a class
+ */
+router.post('/:userId/classes',
+  authorization.verifyToken,
+  authorization.grantAccess('readOwn', 'user'),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId).exec()
+      const danceClass = await DanceClass.findById(req.body.classId).exec()
+
+      if (user === null) {
+        res.status(400).send({ err: 'The user id is not existed!' })
+      }
+      else if (danceClass === null) {
+        res.status(400).send({ err: 'The dance class id is not existed!' })
+      }
+      else if (user.classes.includes(danceClass._id)){
+        res.status(400).send({ err: 'The user has already joint the class!' })
+      }
+      else {
+        await User.findByIdAndUpdate(
+          req.params.userId,
+          { $push: { classes: req.body.classId } },
+          { useFindAndModify: false }
+        )
+        res.status(200).send({ user: user._id, class: req.body.classId })
+      }
+    }
+    catch (err) {
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
   }
