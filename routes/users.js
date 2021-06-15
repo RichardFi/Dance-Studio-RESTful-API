@@ -190,6 +190,42 @@ router.post('/:userId/classes',
   }
 )
 
+
+/*
+ * Remove a user from a class
+ */
+router.delete('/:userId/classes',
+  authorization.verifyToken,
+  authorization.grantAccess('readOwn', 'user'),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId).exec()
+      const danceClass = await DanceClass.findById(req.body.classId).exec()
+
+      if (user === null) {
+        res.status(400).send({ err: 'The user id is not existed!' })
+      }
+      else if (danceClass === null) {
+        res.status(400).send({ err: 'The dance class id is not existed!' })
+      }
+      else if (!user.classes.includes(danceClass._id)){
+        res.status(400).send({ err: 'The user has not joint the class!' })
+      }
+      else {
+        await User.findByIdAndUpdate(
+          req.params.userId,
+          { $pull: { classes: req.body.classId } },
+          { useFindAndModify: false }
+        )
+        res.status(204).send()
+      }
+    }
+    catch (err) {
+      res.status(400).send({ err: { message: err.message, stack: err.stack } })
+    }
+  }
+)
+
 router.patch('/:userId',
   authorization.verifyToken,
   authorization.grantAccess('updateOwn', 'user'),
