@@ -10,6 +10,7 @@ const usersRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
 const coursesRoute = require('./routes/courses')
 const classesRoute = require('./routes/classes')
+const teachersRoute = require('./routes/teachers')
 
 // const userRoute = require('./routes/user');
 // app.use(cors());
@@ -27,6 +28,7 @@ app.use('/api/users', usersRoute)
 app.use('/api/auth', authRoute)
 app.use('/api/courses', coursesRoute)
 app.use('/api/classes', classesRoute)
+app.use('/api/teachers', teachersRoute)
 
 // middlewares
 // app.use(auth)

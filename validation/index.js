@@ -42,7 +42,17 @@ const classValidation = (data) => {
   return schema.validate(data)
 }
 
+const teacherValidation = (data) => {
+  const schema = Joi.object({
+    firstName: Joi.string().max(16).required(),
+    lastName: Joi.string().max(16).required(),
+    description: Joi.string().required()
+  })
+  return schema.validate(data)
+}
+
 module.exports.registerValidation = registerValidation
 module.exports.loginValidation = loginValidation
 module.exports.courseValidation = courseValidation
 module.exports.classValidation = classValidation
+module.exports.teacherValidation = teacherValidation

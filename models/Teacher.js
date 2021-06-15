@@ -11,13 +11,9 @@ const TeacherSchema = mongoose.Schema({
     required: true,
     max: 16
   },
-  courses: {
-    type: [String],
-    default: []
-  },
-  classes: {
-    type: [String],
-    default: []
+  description: {
+    type: String,
+    required: true,
   },
   enrolDate: {
     type: Date,

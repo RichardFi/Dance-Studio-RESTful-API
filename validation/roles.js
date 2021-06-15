@@ -7,6 +7,7 @@ exports.roles = (function () {
     .updateOwn('user')
     .updateOwn('class')
     .deleteOwn('class')
+    .readAny('teacher')
   // .readAny("course")
   // .readAny("class")
   // .readAny("teacher")

@@ -85,7 +85,6 @@ router.post('/',
   authorization.grantAccess('updateAny', 'class'),
   async (req, res) => {
     // validate the data before we create a course
-    console.log(req.body)
     const { error } = classValidation(req.body)
     if (error) return res.status(400).send(error.details[0].message)
 

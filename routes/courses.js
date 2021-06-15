@@ -100,7 +100,8 @@ router.patch('/:courseId',
     } catch (err) {
       res.status(400).send({ err: err })
     }
-  })
+  }
+)
 
 /*
  * Delete a course
@@ -120,6 +121,7 @@ router.delete('/:courseId',
       // console.log(err)
       res.status(400).send({ err: 'The course id is not a objectId!' })
     }
-  })
+  }
+)
 
 module.exports = router
