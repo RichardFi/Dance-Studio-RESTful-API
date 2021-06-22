@@ -16,8 +16,10 @@ router.get('/',
 
     try {
       const verified = jwt.verify(token, process.env.TOKEN_SECRET)
+      const user = await User.findById(verified._id).exec()
+
       // userId
-      return res.status(200).send({ user: verified })
+      return res.status(200).send({ user: user })
     } catch (err) {
       res.status(401).send({ err: 'Invalid Token' })
     }
@@ -44,7 +46,7 @@ router.post('/', async (req, res) => {
       expiresIn: '7d'
     })
 
-  return res.header('auth-token', token).status(200).send({ role: user.role, token: token })
+  return res.header('auth-token', token).status(200).send({ role: user.role, token: token, firstName: user.firstName})
 
   // res.send('Logged in!');
 })
