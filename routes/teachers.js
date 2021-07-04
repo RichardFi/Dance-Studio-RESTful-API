@@ -60,7 +60,7 @@ router.get('/:teacherId',
 
 /*
  * Create a new teacher
- * params: firstName, lastName, gender, phone, email, password
+ * params: name
  * success response: the created teacher's id
  */
 router.post('/', async (req, res) => {
@@ -70,8 +70,7 @@ router.post('/', async (req, res) => {
 
   // create a new teacher
   const teacher = new Teacher({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
+    name: req.body.name,
     description: req.body.description
   })
 
@@ -99,7 +98,7 @@ router.patch('/:teacherId',
         params,
         { useFindAndModify: false }
       )
-      res.status(200).send('Teacher information modified!')
+      res.status(200).send({'message': 'Teacher information modified!'})
     } catch (err) {
       res.status(400).send({ err: err })
     }

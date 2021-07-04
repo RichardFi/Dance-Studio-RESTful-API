@@ -1,15 +1,10 @@
 const mongoose = require('mongoose')
 
 const TeacherSchema = mongoose.Schema({
-  firstName: {
+  name: {
     type: String,
     required: true,
-    max: 16
-  },
-  lastName: {
-    type: String,
-    required: true,
-    max: 16
+    max: 32
   },
   description: {
     type: String,
