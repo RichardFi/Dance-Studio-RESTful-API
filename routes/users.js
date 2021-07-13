@@ -11,7 +11,8 @@ const DanceClass = require('../models/Class')
  * Get users
  * Only admin can access
  */
-router.get('/',
+router.get(
+  '/',
   authorization.verifyToken,
   authorization.grantAccess('readAny', 'user'),
   async (req, res) => {
@@ -24,7 +25,7 @@ router.get('/',
             obj.$regex = new RegExp(req.query[prop], 'i')
             params[prop] = obj
           }
-        };
+        }
         const users = await User.find(params)
         res.status(200).send(users)
       } else {
@@ -67,11 +68,9 @@ router.post('/', async (req, res) => {
 
   try {
     await user.save()
-    const token = jwt.sign({ _id: user._id },
-      process.env.TOKEN_SECRET,
-      {
-        expiresIn: '7d'
-      })
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
+      expiresIn: '7d'
+    })
     res.status(201).send({ user: user._id, token: token })
   } catch (err) {
     res.statas(400).send({ err: { message: err.message, stack: err.stack } })
@@ -81,7 +80,8 @@ router.post('/', async (req, res) => {
 /*
  * Get a user by user id
  */
-router.get('/:userId',
+router.get(
+  '/:userId',
   authorization.verifyToken,
   authorization.grantAccess('readOwn', 'user'),
   async (req, res) => {
@@ -103,7 +103,8 @@ router.get('/:userId',
 /*
  * Get all classes in a given user
  */
-router.get('/:userId/classes',
+router.get(
+  '/:userId/classes',
   authorization.verifyToken,
   authorization.grantAccess('readOwn', 'user'),
   async (req, res) => {
@@ -117,11 +118,16 @@ router.get('/:userId/classes',
             obj.$regex = new RegExp(req.query[prop], 'i')
             params[prop] = obj
           }
-        };
-        const usersClasses = await DanceClass.find({ _id: { $in: user.classes }, ...params });
+        }
+        const usersClasses = await DanceClass.find({
+          _id: { $in: user.classes },
+          ...params
+        })
         res.status(200).send(usersClasses)
       } else {
-        const usersClasses = await DanceClass.find({ _id: { $in: user.classes } });
+        const usersClasses = await DanceClass.find({
+          _id: { $in: user.classes }
+        })
         res.status(200).send(usersClasses)
       }
     } catch (err) {
@@ -133,7 +139,8 @@ router.get('/:userId/classes',
 /*
  * Get a class in a given user
  */
-router.get('/:userId/classes/:classId',
+router.get(
+  '/:userId/classes/:classId',
   authorization.verifyToken,
   authorization.grantAccess('readOwn', 'user'),
   async (req, res) => {
@@ -142,7 +149,7 @@ router.get('/:userId/classes/:classId',
       if (user === null) {
         res.status(400).send({ err: 'The user id is not existed!' })
       } else {
-        const usersClass = await DanceClass.findById(req.params.classId);
+        const usersClass = await DanceClass.findById(req.params.classId)
         if (usersClass === null) {
           res.status(400).send({ err: 'The class id is not existed!' })
         } else {
@@ -158,43 +165,50 @@ router.get('/:userId/classes/:classId',
 /*
  * Add a user to a class
  */
-router.post('/:userId/classes',
+router.post(
+  '/:userId/classes',
   authorization.verifyToken,
   authorization.grantAccess('readOwn', 'user'),
   async (req, res) => {
     try {
       const user = await User.findById(req.params.userId).exec()
-      const danceClass = await DanceClass.findById(req.body.classId).exec()
+      const danceClass = await DanceClass.findById(req.body._id).exec()
 
       if (user === null) {
-        res.status(400).send({ err: 'The user id is not existed!' })
-      }
-      else if (danceClass === null) {
-        res.status(400).send({ err: 'The dance class id is not existed!' })
-      }
-      else if (user.classes.includes(danceClass._id)){
-        res.status(400).send({ err: 'The user has already joint the class!' })
-      }
-      else {
+        res
+          .status(400)
+          .send({ success: false, message: 'The user id is not existed!' })
+      } else if (danceClass === null) {
+        res.status(400).send({
+          success: false,
+          message: 'The dance class id is not existed!'
+        })
+      } else if (user.classes.includes(danceClass._id)) {
+        res.status(400).send({
+          success: false,
+          message: 'The user has already joint the class!'
+        })
+      } else {
         await User.findByIdAndUpdate(
           req.params.userId,
-          { $push: { classes: req.body.classId } },
+          { $push: { classes: req.body._id } },
           { useFindAndModify: false }
         )
-        res.status(200).send({ user: user._id, class: req.body.classId })
+        res
+          .status(200)
+          .send({ success: true, user: user._id, class: req.body._id })
       }
-    }
-    catch (err) {
-      res.status(400).send({ err: { message: err.message, stack: err.stack } })
+    } catch (err) {
+      res.status(400).send({ success: false, message: err.message })
     }
   }
 )
 
-
 /*
  * Remove a user from a class
  */
-router.delete('/:userId/classes',
+router.delete(
+  '/:userId/classes',
   authorization.verifyToken,
   authorization.grantAccess('readOwn', 'user'),
   async (req, res) => {
@@ -204,14 +218,11 @@ router.delete('/:userId/classes',
 
       if (user === null) {
         res.status(400).send({ err: 'The user id is not existed!' })
-      }
-      else if (danceClass === null) {
+      } else if (danceClass === null) {
         res.status(400).send({ err: 'The dance class id is not existed!' })
-      }
-      else if (!user.classes.includes(danceClass._id)){
+      } else if (!user.classes.includes(danceClass._id)) {
         res.status(400).send({ err: 'The user has not joint the class!' })
-      }
-      else {
+      } else {
         await User.findByIdAndUpdate(
           req.params.userId,
           { $pull: { classes: req.body.classId } },
@@ -219,25 +230,28 @@ router.delete('/:userId/classes',
         )
         res.status(204).send()
       }
-    }
-    catch (err) {
+    } catch (err) {
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
   }
 )
 
-router.patch('/:userId',
+router.patch(
+  '/:userId',
   authorization.verifyToken,
   authorization.grantAccess('updateOwn', 'user'),
   async (req, res) => {
     try {
       const user = await User.findById(req.params.userId).exec()
       if (req.user._id !== req.params.userId && user.role !== 'admin') {
-        return res.status(400).send({ err: 'The id is not consistent with the token!' })
+        return res
+          .status(400)
+          .send({ err: 'The id is not consistent with the token!' })
       }
       const params = {}
       // email cannot be changed
-      for (const prop in req.body) if (req.body[prop] && prop !== 'email') params[prop] = req.body[prop]
+      for (const prop in req.body)
+        if (req.body[prop] && prop !== 'email') params[prop] = req.body[prop]
 
       // hash passwords
       if (params.password) {
@@ -248,18 +262,18 @@ router.patch('/:userId',
       if (user === null) {
         return res.status(400).send({ err: 'The id is not existed!' })
       }
-      await User.findByIdAndUpdate(
-        req.params.userId,
-        params,
-        { useFindAndModify: false }
-      )
+      await User.findByIdAndUpdate(req.params.userId, params, {
+        useFindAndModify: false
+      })
       res.status(200).send('User profile modified!')
     } catch (err) {
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
-  })
+  }
+)
 
-router.delete('/:userId',
+router.delete(
+  '/:userId',
   authorization.verifyToken,
   authorization.grantAccess('deleteAny', 'user'),
   async (req, res) => {
@@ -274,6 +288,7 @@ router.delete('/:userId',
       // console.log(err)
       res.status(400).send({ err: { message: err.message, stack: err.stack } })
     }
-  })
+  }
+)
 
 module.exports = router
