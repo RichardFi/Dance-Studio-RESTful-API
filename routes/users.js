@@ -214,8 +214,8 @@ router.delete(
   async (req, res) => {
     try {
       const user = await User.findById(req.params.userId).exec()
-      const danceClass = await DanceClass.findById(req.body.classId).exec()
-
+      const danceClass = await DanceClass.findById(req.body._id).exec()
+      
       if (user === null) {
         res.status(400).send({ err: 'The user id is not existed!' })
       } else if (danceClass === null) {
@@ -225,7 +225,7 @@ router.delete(
       } else {
         await User.findByIdAndUpdate(
           req.params.userId,
-          { $pull: { classes: req.body.classId } },
+          { $pull: { classes: req.body._id } },
           { useFindAndModify: false }
         )
         res.status(204).send()
