@@ -38,10 +38,10 @@ router.get('/', async (req, res) => {
       }
 
       const danceClasses = await DanceClass.find(params)
-      res.status(200).send({code:"200",msg:"success", data: danceClasses})
+      res.status(200).send(danceClasses)
     } else {
       const danceClasses = await DanceClass.find()
-      res.status(200).send({code:"200",msg:"success", data: danceClasses})
+      res.status(200).send(danceClasses)
     }
   } catch (err) {
     res.status(400).send({ message: err })
